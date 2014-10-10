@@ -14,7 +14,8 @@
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
 		027794F519D7DEBD0086BF1A /* RibbonMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 027794F319D7DEBD0086BF1A /* RibbonMesh.cpp */; };
 		027794F819D893700086BF1A /* RibbonManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 027794F619D893700086BF1A /* RibbonManager.cpp */; };
-		02EB0FC719E102130039C969 /* FrequencyProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FC519E102130039C969 /* FrequencyProcessor.cpp */; };
+		02EB0FC719E102130039C969 /* AudioProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FC519E102130039C969 /* AudioProcessor.cpp */; };
+		02EB0FCE19E7AE140039C969 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FCC19E7AE140039C969 /* README.md */; };
 		1F9B89BD76C84C92AE506B0A /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = 37863447DF5B4E578DDC6966 /* CinderApp.icns */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
@@ -32,8 +33,10 @@
 		027794F419D7DEBD0086BF1A /* RibbonMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibbonMesh.h; path = ../src/RibbonMesh.h; sourceTree = "<group>"; };
 		027794F619D893700086BF1A /* RibbonManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibbonManager.cpp; path = ../src/RibbonManager.cpp; sourceTree = "<group>"; };
 		027794F719D893700086BF1A /* RibbonManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibbonManager.h; path = ../src/RibbonManager.h; sourceTree = "<group>"; };
-		02EB0FC519E102130039C969 /* FrequencyProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrequencyProcessor.cpp; path = ../src/FrequencyProcessor.cpp; sourceTree = "<group>"; };
-		02EB0FC619E102130039C969 /* FrequencyProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FrequencyProcessor.h; path = ../src/FrequencyProcessor.h; sourceTree = "<group>"; };
+		02EB0FC519E102130039C969 /* AudioProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioProcessor.cpp; path = ../src/AudioProcessor.cpp; sourceTree = "<group>"; };
+		02EB0FC619E102130039C969 /* AudioProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioProcessor.h; path = ../src/AudioProcessor.h; sourceTree = "<group>"; };
+		02EB0FCB19E646830039C969 /* RibbonsApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RibbonsApp.h; path = ../src/RibbonsApp.h; sourceTree = "<group>"; };
+		02EB0FCC19E7AE140039C969 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -76,7 +79,7 @@
 		080E96DDFE201D6D7F000001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				02EB0FC519E102130039C969 /* FrequencyProcessor.cpp */,
+				02EB0FC519E102130039C969 /* AudioProcessor.cpp */,
 				027794F619D893700086BF1A /* RibbonManager.cpp */,
 				027794F319D7DEBD0086BF1A /* RibbonMesh.cpp */,
 				A2DF4174E5BD4D5E85613E86 /* RibbonsApp.cpp */,
@@ -119,6 +122,7 @@
 		29B97314FDCFA39411CA2CEA /* Ribbons */ = {
 			isa = PBXGroup;
 			children = (
+				02EB0FCC19E7AE140039C969 /* README.md */,
 				01B97315FEAEA392516A2CEA /* Blocks */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				29B97315FDCFA39411CA2CEA /* Headers */,
@@ -132,11 +136,12 @@
 		29B97315FDCFA39411CA2CEA /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				02EB0FC619E102130039C969 /* FrequencyProcessor.h */,
+				02EB0FC619E102130039C969 /* AudioProcessor.h */,
 				69C0EA94437F4A37BC146E1F /* Resources.h */,
 				027794F719D893700086BF1A /* RibbonManager.h */,
 				027794F419D7DEBD0086BF1A /* RibbonMesh.h */,
 				FCC5A6A1223646DC9C2A2635 /* Ribbons_Prefix.pch */,
+				02EB0FCB19E646830039C969 /* RibbonsApp.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -224,7 +229,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				027794F519D7DEBD0086BF1A /* RibbonMesh.cpp in Sources */,
-				02EB0FC719E102130039C969 /* FrequencyProcessor.cpp in Sources */,
+				02EB0FC719E102130039C969 /* AudioProcessor.cpp in Sources */,
+				02EB0FCE19E7AE140039C969 /* README.md in Sources */,
 				027794F819D893700086BF1A /* RibbonManager.cpp in Sources */,
 				E048231046E045D5AED2B0AA /* RibbonsApp.cpp in Sources */,
 			);

@@ -12,16 +12,22 @@
 #include <vector>
 
 #include "RibbonMesh.h"
+#include "AudioProcessor.h"
+
+typedef std::vector<RibbonMesh> RibbonBin;
 
 class RibbonManager {
 public:
     explicit RibbonManager();
+    void setProcessor(AudioProcessor *processor);
 
     void update(float delta);
-    void draw();
+    void draw() const;
 
 private:
-    std::vector<RibbonMesh> ribbons;
+    std::vector<RibbonBin> ribbons;
+
+    AudioProcessor *mProcessor;
 };
 
 #endif /* defined(__Ribbons__RibbonManager__) */

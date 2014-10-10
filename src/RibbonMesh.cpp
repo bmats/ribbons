@@ -11,21 +11,40 @@
 // Accuracy of ribbon, # quads / 1 unit length
 #define RIBBON_QUAD_PER_LENGTH 2
 
+#define FADE_IN_DIST 10.0f
+
 #define PI 3.141592653589793f
 
-#define RIBBON_WIDTH 3.0f
-
 RibbonMesh::RibbonMesh()
-    : mColor(0.5f, 0.5f, 0.5f) {
+    : mColor( ci::Color(0.5f, 0.5f, 0.5f) ),
+      mPos( ci::Vec3f::zero() ) {
+
+    mStartZ = mPeriod = mAmp = 0.0f;
+    mWidth  = 1.0f;
+    mSpeed  = 10.0f;
+    mLength = 15.0f;
 }
 
-void RibbonMesh::setPos(float x, float y) {
+void RibbonMesh::setAngle(float angle) {
+    mAngle = angle;
+}
+
+void RibbonMesh::setPos(float x, float y, float z) {
     mPos.x = x;
     mPos.y = y;
+    mPos.z = z;
+}
+
+void RibbonMesh::setStartZ(float z) {
+    mStartZ = z;
 }
 
 void RibbonMesh::setColor(ci::Color color) {
     mColor = color;
+}
+
+void RibbonMesh::setWidth(float width) {
+    mWidth = width;
 }
 
 void RibbonMesh::setSpeed(float speed) {
@@ -40,9 +59,15 @@ void RibbonMesh::setAttr(float period, float amplitude, float length) {
 
 void RibbonMesh::update(float delta) {
     mPos.z += mSpeed * delta;
-}
 
-void RibbonMesh::buildMesh() {
+    // Fade the color in if necessary over a distance from white
+    if (mPos.z - mStartZ > FADE_IN_DIST) {
+        mDisplayColor = mColor;
+    }
+    else
+        mDisplayColor = ci::Color::white() - (ci::Color::white() - mColor) * (mPos.z - mStartZ) / FADE_IN_DIST;
+
+    // Build mesh
     int nQuads = (int)roundf(mLength * RIBBON_QUAD_PER_LENGTH);
     float quadLen = mLength / nQuads;
     float startZ = mPos.z + quadLen * 0.5f;
@@ -57,19 +82,19 @@ void RibbonMesh::buildMesh() {
         mMesh.appendVertex(ci::Vec3f(mPos.x,
                                      mPos.y + yOff,
                                      startZ - i * quadLen));
-        mMesh.appendColorRgb(mColor);
-        mMesh.appendVertex(ci::Vec3f(mPos.x + RIBBON_WIDTH,
+        mMesh.appendColorRgb(mDisplayColor);
+        mMesh.appendVertex(ci::Vec3f(mPos.x + mWidth,
                                      mPos.y + yOff,
                                      startZ - i * quadLen));
-        mMesh.appendColorRgb(mColor);
-        mMesh.appendVertex(ci::Vec3f(mPos.x + RIBBON_WIDTH,
+        mMesh.appendColorRgb(mDisplayColor);
+        mMesh.appendVertex(ci::Vec3f(mPos.x + mWidth,
                                      mPos.y + nextYOff,
                                      startZ - (i + 1) * quadLen));
-        mMesh.appendColorRgb(mColor);
+        mMesh.appendColorRgb(mDisplayColor);
         mMesh.appendVertex(ci::Vec3f(mPos.x,
                                      mPos.y + nextYOff,
                                      startZ - (i + 1) * quadLen));
-        mMesh.appendColorRgb(mColor);
+        mMesh.appendColorRgb(mDisplayColor);
 
         mMesh.appendTriangle(idx + 0, idx + 1, idx + 2);
         mMesh.appendTriangle(idx + 0, idx + 2, idx + 3);
@@ -80,6 +105,18 @@ void RibbonMesh::buildMesh() {
     }
 }
 
-ci::TriMesh *RibbonMesh::getMesh() {
-    return &mMesh;
+const ci::TriMesh &RibbonMesh::getMesh() const {
+    return mMesh;
+}
+
+ci::Vec3f &RibbonMesh::getPosVec() {
+    return mPos;
+}
+
+float RibbonMesh::getLength() const {
+    return mLength;
+}
+
+void RibbonMesh::resetPosZ() {
+    mPos.z = mStartZ;
 }
