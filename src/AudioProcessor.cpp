@@ -14,9 +14,11 @@
 
 #define MIN_FREQ 200
 #define MAX_FREQ 4500
-#define BEAT_MAX_FREQ 330
-#define BEAT_THRESHOLD 0.12f
+
 #define CAPTURE_INTERVAL 0.02f
+
+#define BEAT_MAX_FREQ 350
+#define BEAT_THRESHOLD 0.11f
 
 #define FREQ_TO_BIN(freq) (size_t)((float)freq * mMonitorSpectralNode->getFftSize() / mMonitorSpectralNode->getSampleRate());
 

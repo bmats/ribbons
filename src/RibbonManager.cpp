@@ -12,24 +12,15 @@
 #include "RibbonsApp.h"
 
 #define NUM_BIN_GROUPS 8
-#define RIBBONS_PER_BIN 8
+#define RIBBONS_PER_BIN 6
 
-#define PI 3.141592653589793f
-
-static void randomizeRibbonPos(ci::Vec3f &pos) {
-    float angle = randf() * 2.0f * pi;
-    float dist  = 10.0f + randf() * 5.0f;
-
-    pos.x = cos(angle) * dist;
-    pos.y = sin(angle) * dist;
-}
-
-static ci::Color rainbowColor(float seed) {
+static ci::Color getColorForBin(float bin) {
+    bin *= 15.0f;
     // see http://krazydad.com/tutorials/makecolors.php
     return ci::Color(
-        (sin(0.025f * seed       ) * 127.0f + 128.0f) / 255.0f,
-        (sin(0.025f * seed + 2.0f) * 127.0f + 128.0f) / 255.0f,
-        (sin(0.025f * seed + 4.0f) * 127.0f + 128.0f) / 255.0f);
+        (sinf(0.025f * bin       ) * 127.0f + 128.0f) / 255.0f,
+        (sinf(0.025f * bin + 2.0f) * 127.0f + 128.0f) / 255.0f,
+        (sinf(0.025f * bin + 4.0f) * 127.0f + 128.0f) / 255.0f);
 }
 
 RibbonManager::RibbonManager() {
@@ -43,14 +34,10 @@ RibbonManager::RibbonManager() {
 //                        ((float)b / NUM_BIN_GROUPS) * 0.3f,
 //                        ((float)b / NUM_BIN_GROUPS) * 0.6f,
 //                        ((float)b / NUM_BIN_GROUPS) * 1.0f);
-        ci::Color color = rainbowColor(b * 15.0f);
+        ci::Color color = getColorForBin(b);
 
-        for (uint r = 0; r < RIBBONS_PER_BIN + b; ++r) {
+        for (uint r = 0; r < RIBBONS_PER_BIN + b * 2; ++r) {
             RibbonMesh ribbon;
-            ci::Vec3f &pos = ribbon.getPosVec();
-            randomizeRibbonPos(pos);
-            pos.z = randf() * -CAMERA_DISTANCE;
-            ribbon.setStartZ(pos.z);
 
             // Dependent on bin
             ribbon.setWidth(3.0f - b * 0.3f);
@@ -80,12 +67,6 @@ void RibbonManager::update(float delta) {
         for (auto ribbonIt = binIt->begin(); ribbonIt != binIt->end(); ++ribbonIt) {
             RibbonMesh &ribbon = *ribbonIt;
             ribbon.setAttr(5.0f, amp * 300.0f, 15.0f);
-
-            ci::Vec3f &pos = ribbon.getPosVec();
-            if (pos.z - ribbon.getLength() * 0.5f > CAMERA_DISTANCE) {
-                randomizeRibbonPos(pos);
-                ribbon.resetPosZ();
-            }
 
             ribbon.update(delta);
         }

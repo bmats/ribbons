@@ -16,10 +16,8 @@ class RibbonMesh {
 public:
     explicit RibbonMesh();
 
-    void setAngle(float angle);
+    void reset();
 
-    void setPos(float x, float y, float z);
-    void setStartZ(float z);
     void setColor(ci::Color color);
     void setWidth(float width);
     void setSpeed(float speed);
@@ -34,9 +32,10 @@ public:
     
 private:
     ci::TriMesh mMesh;
-    ci::Color mColor, mDisplayColor;
+    ci::Color mColor;
+    ci::ColorA mDisplayColor;
     ci::Vec3f mPos;
-    float mStartZ, mAngle = 0, mWidth, mSpeed, mPeriod, mAmp, mLength;
+    float mStartZ, mAngle = 0, mDist, mWidth, mSpeed, mPeriod, mAmp, mLength;
 };
 
 #endif /* defined(__Ribbons__RibbonMesh__) */
