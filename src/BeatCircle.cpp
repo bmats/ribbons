@@ -30,7 +30,7 @@ void BeatCircle::update(float delta) {
 
     mMesh.clear();
 
-    float sectorAngle = 2.0f * PI / MAX_SEGMENTS;
+    float sectorAngle = 2.0f * M_PI / MAX_SEGMENTS;
     for (int i = 0; i < MAX_SEGMENTS; ++i) {
         float angle     = sectorAngle * i,
               nextAngle = sectorAngle * (i + 1);

@@ -6,10 +6,10 @@
 //
 //
 
+#undef RADIAL_RIBBONS
+
 #include "RibbonMesh.h"
 #include "RibbonsApp.h"
-
-#define RADIAL_RIBBONS
 
 // Accuracy of ribbon, # quads / 1 unit length
 #define RIBBON_QUAD_PER_LENGTH 2
@@ -28,7 +28,7 @@ RibbonMesh::RibbonMesh()
 }
 
 void RibbonMesh::reset() {
-    mAngle = randf() * 2.0f * PI;
+    mAngle = randf() * 2.0f * M_PI;
     mDist  = 10.0f + randf() * 5.0f;
 
     mPos.x = cosf(mAngle) * mDist;
@@ -79,8 +79,8 @@ void RibbonMesh::update(float delta) {
     mMesh.clear();
 
     for (int i = 0; i < nQuads; ++i) {
-        float yOff     = mAmp * sinf((mPos.z + (nQuads - i)     * quadLen) * PI / mPeriod),
-              nextYOff = mAmp * sinf((mPos.z + (nQuads - i - 1) * quadLen) * PI / mPeriod);
+        float yOff     = mAmp * sinf((mPos.z + (nQuads - i)     * quadLen) * M_PI / mPeriod),
+              nextYOff = mAmp * sinf((mPos.z + (nQuads - i - 1) * quadLen) * M_PI / mPeriod);
         size_t idx = mMesh.getNumVertices();
 
 #ifdef RADIAL_RIBBONS
@@ -91,20 +91,20 @@ void RibbonMesh::update(float delta) {
                                  sinf(mAngle) * (mDist + nextYOff),
                                  mPos.z - (i + 1) * quadLen);
 
-        mMesh.appendVertex(quadCenter + ci::Vec3f(-sinf(mAngle) * mWidth * -0.5f,
-                                                  -cosf(mAngle) * mWidth * -0.5f,
+        mMesh.appendVertex(quadCenter + ci::Vec3f(-cosf(M_PI * 0.5f + mAngle) * mWidth * -0.5f,
+                                                  -sinf(M_PI * 0.5f + mAngle) * mWidth * -0.5f,
                                                   0.0f));
         mMesh.appendColorRgba(mDisplayColor);
-        mMesh.appendVertex(quadCenter + ci::Vec3f(-sinf(mAngle) * mWidth * 0.5f,
-                                                  -cosf(mAngle) * mWidth * 0.5f,
+        mMesh.appendVertex(quadCenter + ci::Vec3f(-cosf(M_PI * 0.5f + mAngle) * mWidth * 0.5f,
+                                                  -sinf(M_PI * 0.5f + mAngle) * mWidth * 0.5f,
                                                   0.0f));
         mMesh.appendColorRgba(mDisplayColor);
-        mMesh.appendVertex(nextQuadCenter + ci::Vec3f(-sinf(mAngle) * mWidth * 0.5f,
-                                                      -cosf(mAngle) * mWidth * 0.5f,
+        mMesh.appendVertex(nextQuadCenter + ci::Vec3f(-cosf(M_PI * 0.5f + mAngle) * mWidth * 0.5f,
+                                                      -sinf(M_PI * 0.5f + mAngle) * mWidth * 0.5f,
                                                       0.0f));
         mMesh.appendColorRgba(mDisplayColor);
-        mMesh.appendVertex(nextQuadCenter + ci::Vec3f(-sinf(mAngle) * mWidth * -0.5f,
-                                                      -cosf(mAngle) * mWidth * -0.5f,
+        mMesh.appendVertex(nextQuadCenter + ci::Vec3f(-cosf(M_PI * 0.5f + mAngle) * mWidth * -0.5f,
+                                                      -sinf(M_PI * 0.5f + mAngle) * mWidth * -0.5f,
                                                       0.0f));
         mMesh.appendColorRgba(mDisplayColor);
 #else
