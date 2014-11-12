@@ -21,7 +21,7 @@ RibbonMesh::RibbonMesh()
 
     mPeriod = mAmp = 0.0f;
     mWidth  = 1.0f;
-    mSpeed  = 10.0f;
+    mVel  = 10.0f;
     mLength = 15.0f;
 
     reset();
@@ -46,8 +46,8 @@ void RibbonMesh::setWidth(float width) {
     mWidth = width;
 }
 
-void RibbonMesh::setSpeed(float speed) {
-    mSpeed = speed;
+void RibbonMesh::setVel(float vel) {
+    mVel = vel;
 }
 
 void RibbonMesh::setAttr(float period, float amplitude, float length) {
@@ -57,7 +57,7 @@ void RibbonMesh::setAttr(float period, float amplitude, float length) {
 }
 
 void RibbonMesh::update(float delta) {
-    mPos.z += mSpeed * delta;
+    mPos.z += mVel * delta;
 
     if (mPos.z - mLength > CAMERA_DISTANCE) {
         reset();

@@ -13,8 +13,10 @@
 		00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B10FF439BC000DE1D7 /* AudioUnit.framework */; };
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
 		026289F019EB1C0000894F74 /* libovr.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 026289ED19EB1BDE00894F74 /* libovr.a */; };
+		02644D391A11ADCF00937F23 /* PitchCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02644D371A11ADCF00937F23 /* PitchCircle.cpp */; };
 		027794F519D7DEBD0086BF1A /* RibbonMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 027794F319D7DEBD0086BF1A /* RibbonMesh.cpp */; };
 		027794F819D893700086BF1A /* RibbonManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 027794F619D893700086BF1A /* RibbonManager.cpp */; };
+		029D20611A13308E0080E196 /* Starfield.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 029D205F1A13308E0080E196 /* Starfield.cpp */; };
 		02A24D8C19E9047600CBD22F /* BeatCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02A24D8A19E9047600CBD22F /* BeatCircle.cpp */; };
 		02EB0FC719E102130039C969 /* AudioProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FC519E102130039C969 /* AudioProcessor.cpp */; };
 		02EB0FCE19E7AE140039C969 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FCC19E7AE140039C969 /* README.md */; };
@@ -49,10 +51,14 @@
 		00B784B10FF439BC000DE1D7 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		00B784B20FF439BC000DE1D7 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		026289E819EB1BDE00894F74 /* LibOVR.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LibOVR.xcodeproj; path = ../../../../oculus/OculusSDK/LibOVR/Projects/Mac/Xcode/LibOVR.xcodeproj; sourceTree = "<group>"; };
+		02644D371A11ADCF00937F23 /* PitchCircle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PitchCircle.cpp; path = ../src/PitchCircle.cpp; sourceTree = "<group>"; };
+		02644D381A11ADCF00937F23 /* PitchCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PitchCircle.h; path = ../src/PitchCircle.h; sourceTree = "<group>"; };
 		027794F319D7DEBD0086BF1A /* RibbonMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibbonMesh.cpp; path = ../src/RibbonMesh.cpp; sourceTree = "<group>"; };
 		027794F419D7DEBD0086BF1A /* RibbonMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibbonMesh.h; path = ../src/RibbonMesh.h; sourceTree = "<group>"; };
 		027794F619D893700086BF1A /* RibbonManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RibbonManager.cpp; path = ../src/RibbonManager.cpp; sourceTree = "<group>"; };
 		027794F719D893700086BF1A /* RibbonManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibbonManager.h; path = ../src/RibbonManager.h; sourceTree = "<group>"; };
+		029D205F1A13308E0080E196 /* Starfield.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Starfield.cpp; path = ../src/Starfield.cpp; sourceTree = "<group>"; };
+		029D20601A13308E0080E196 /* Starfield.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Starfield.h; path = ../src/Starfield.h; sourceTree = "<group>"; };
 		02A24D8A19E9047600CBD22F /* BeatCircle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BeatCircle.cpp; path = ../src/BeatCircle.cpp; sourceTree = "<group>"; };
 		02A24D8B19E9047600CBD22F /* BeatCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BeatCircle.h; path = ../src/BeatCircle.h; sourceTree = "<group>"; };
 		02EB0FC519E102130039C969 /* AudioProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioProcessor.cpp; path = ../src/AudioProcessor.cpp; sourceTree = "<group>"; };
@@ -112,9 +118,11 @@
 			children = (
 				02EB0FC519E102130039C969 /* AudioProcessor.cpp */,
 				02A24D8A19E9047600CBD22F /* BeatCircle.cpp */,
+				02644D371A11ADCF00937F23 /* PitchCircle.cpp */,
 				027794F619D893700086BF1A /* RibbonManager.cpp */,
 				027794F319D7DEBD0086BF1A /* RibbonMesh.cpp */,
 				A2DF4174E5BD4D5E85613E86 /* RibbonsApp.cpp */,
+				029D205F1A13308E0080E196 /* Starfield.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -171,11 +179,13 @@
 			children = (
 				02EB0FC619E102130039C969 /* AudioProcessor.h */,
 				02A24D8B19E9047600CBD22F /* BeatCircle.h */,
+				02644D381A11ADCF00937F23 /* PitchCircle.h */,
 				69C0EA94437F4A37BC146E1F /* Resources.h */,
 				027794F719D893700086BF1A /* RibbonManager.h */,
 				027794F419D7DEBD0086BF1A /* RibbonMesh.h */,
 				FCC5A6A1223646DC9C2A2635 /* Ribbons_Prefix.pch */,
 				02EB0FCB19E646830039C969 /* RibbonsApp.h */,
+				029D20601A13308E0080E196 /* Starfield.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -281,7 +291,9 @@
 			files = (
 				027794F519D7DEBD0086BF1A /* RibbonMesh.cpp in Sources */,
 				02EB0FC719E102130039C969 /* AudioProcessor.cpp in Sources */,
+				02644D391A11ADCF00937F23 /* PitchCircle.cpp in Sources */,
 				02EB0FCE19E7AE140039C969 /* README.md in Sources */,
+				029D20611A13308E0080E196 /* Starfield.cpp in Sources */,
 				02A24D8C19E9047600CBD22F /* BeatCircle.cpp in Sources */,
 				027794F819D893700086BF1A /* RibbonManager.cpp in Sources */,
 				E048231046E045D5AED2B0AA /* RibbonsApp.cpp in Sources */,
@@ -315,10 +327,7 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				HEADER_SEARCH_PATHS = (
-					"\"$(CINDER_PATH)/boost\"",
-					../blocks/KissFFT/src,
-				);
+				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
@@ -346,10 +355,7 @@
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				HEADER_SEARCH_PATHS = (
-					"\"$(CINDER_PATH)/boost\"",
-					../blocks/KissFFT/src,
-				);
+				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";

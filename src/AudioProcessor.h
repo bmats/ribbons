@@ -28,11 +28,15 @@ public:
     void update(float time);
 
     size_t getNumBins() const;
+    size_t getSampleRate() const;
+    float getAmpForBin(size_t bin) const;
     float getAmpForBins(size_t start, size_t len) const;
     float getVolume() const;
     float getTotalDiff() const;
-    bool isBeat();
     float getDiffBetween(float minFreq, float maxFreq) const;
+
+    bool isBeat();
+    size_t getMaxFreq(float min, float max) const;
 
 private:
     ci::audio::FilePlayerNodeRef      mFilePlayerNode;

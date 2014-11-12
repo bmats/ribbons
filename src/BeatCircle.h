@@ -21,8 +21,8 @@ public:
     const ci::TriMesh &getMesh();
 
 private:
-    float mRadius;
-    ci::TriMesh mMesh;    
+    float mRadius = 0;
+    ci::TriMesh mMesh;
 };
 
 #endif /* defined(__Ribbons__BeatCircle__) */

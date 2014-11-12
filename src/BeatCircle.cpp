@@ -15,8 +15,7 @@
 #define BORDER_WIDTH 0.7f
 #define CENTER ci::Vec3f::zero()
 
-BeatCircle::BeatCircle()
-    : mRadius(0) {
+BeatCircle::BeatCircle() {
 }
 
 void BeatCircle::update(float delta) {

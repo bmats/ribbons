@@ -12,15 +12,16 @@
 
 #include "AudioProcessor.h"
 
-#define MIN_FREQ 200
-#define MAX_FREQ 4500
+#define MIN_FREQ 100
+#define MAX_FREQ 4300
 
 #define CAPTURE_INTERVAL 0.02f
 
-#define BEAT_MAX_FREQ 350
-#define BEAT_THRESHOLD 0.11f
+#define BEAT_MAX_FREQ 250
+#define BEAT_THRESHOLD 0.09f
 
-#define FREQ_TO_BIN(freq) (size_t)((float)freq * mMonitorSpectralNode->getFftSize() / mMonitorSpectralNode->getSampleRate());
+#define FREQ_TO_BIN(freq) (size_t)((float)freq * mMonitorSpectralNode->getFftSize() / mMonitorSpectralNode->getSampleRate())
+#define BIN_TO_FREQ(bin) bin * mMonitorSpectralNode->getSampleRate() / mMonitorSpectralNode->getFftSize()
 
 
 AudioProcessor::AudioProcessor() {
@@ -83,8 +84,18 @@ size_t AudioProcessor::getNumBins() const {
     return mMaxBin - mMinBin + 1;
 }
 
+size_t AudioProcessor::getSampleRate() const {
+    return mMonitorSpectralNode->getSampleRate();
+}
+
+float AudioProcessor::getAmpForBin(size_t bin) const {
+    return mMagSpectrum->at(bin);
+}
+
 float AudioProcessor::getAmpForBins(size_t start, size_t len) const {
     size_t low = mMinBin + start, high = mMinBin + start + len;
+    if (high > mMagSpectrum->size() - 1) high = mMagSpectrum->size() - 1;
+    if (low > high) low = high;
 
     float total = 0;
     for (size_t i = low; i < high; ++i) {
@@ -112,9 +123,12 @@ float AudioProcessor::getDiffBetween(float minFreq, float maxFreq) const {
     if (!mLastMagSpectrum) return 0.0f;
 
     float total = 0;
-    size_t minBeatBin = FREQ_TO_BIN(minFreq);
+    size_t minBeatBin = FREQ_TO_BIN(minFreq); // can't be < 0
     size_t maxBeatBin = FREQ_TO_BIN(maxFreq);
-    for (size_t i = minBeatBin; i < maxBeatBin; ++i) {
+    if (maxBeatBin > mMagSpectrum->size() - 1) maxBeatBin = mMagSpectrum->size() - 1;
+    if (minBeatBin > maxBeatBin) minBeatBin = maxBeatBin;
+
+    for (size_t i = minBeatBin; i <= maxBeatBin; ++i) {
         total += mMagSpectrum->at(i) - mLastMagSpectrum->at(i);
     }
 
@@ -128,4 +142,24 @@ bool AudioProcessor::isBeat() {
     mLastBeatState = beat;
 
     return lastState ? false : beat;
+}
+
+size_t AudioProcessor::getMaxFreq(float min, float max) const {
+    size_t minBin = FREQ_TO_BIN(min); // can't be < 0
+    size_t maxBin = FREQ_TO_BIN(max);
+    if (maxBin > mMagSpectrum->size()) maxBin = mMagSpectrum->size();
+    if (minBin > maxBin) minBin = maxBin;
+
+    size_t highestBin;
+    float highestAmp = 0;
+    for (size_t i = minBin; i <= maxBin; ++i) {
+        float amp = mMagSpectrum->at(i);
+        if (amp > highestAmp) {
+            highestBin = i;
+            highestAmp = amp;
+        }
+        ++i;
+    }
+
+    return BIN_TO_FREQ(highestBin);
 }

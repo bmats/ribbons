@@ -1,6 +1,4 @@
-#if 1
-
-#define VR
+#undef VR
 
 #include "cinder/app/AppNative.h"
 #include "cinder/gl/gl.h"
@@ -8,12 +6,12 @@
 #include "cinder/gl/Fbo.h"
 #include "cinder/TriMesh.h"
 #include "cinder/DataSource.h"
-#include "cinder/gl/Light.h"
+#include "cinder/Timeline.h"
+
 #ifdef VR
 #define OVR_OS_MAC
 #include "OVR.h"
 #include "OVR_CAPI_GL.h"
-
 #endif
 
 #ifdef _WIN32
@@ -27,6 +25,11 @@
 #include "RibbonManager.h"
 #include "AudioProcessor.h"
 #include "BeatCircle.h"
+#include "PitchCircle.h"
+#include "Starfield.h"
+
+#define NIGHT_CLEAR_COLOR ColorA(0.124f, 0.179f, 0.35f)
+#define TRAILS_ALPHA 0.25f
 
 using namespace ci;
 using namespace ci::app;
@@ -51,7 +54,17 @@ private:
     std::vector<BeatCircle> beats;
 
     RibbonManager mRibbons;
+    PitchCircle mPitchCircle;
     AudioProcessor mProcessor;
+    Starfield mStarfield;
+
+    ColorA mClearColor;
+    Anim<ColorA> mClearColorAnim;
+
+    bool mIsNightModeEnabled = false;
+    Anim<float> mNightModeOpacityAnim;
+
+    bool mIsTrailsEnabled = false;
 
 #ifdef VR
     gl::Fbo mFbo[ovrEye_Count];
@@ -63,7 +76,8 @@ private:
 };
 
 RibbonsApp::RibbonsApp()
-    : mElapsed(0) {
+    : mElapsed(0),
+      mClearColor(ColorA::white()) {
 }
 
 void RibbonsApp::prepareSettings(Settings *settings) {
@@ -175,13 +189,15 @@ void RibbonsApp::setup() {
     // Visualizer
 #if 0
     fs::path file = getOpenFilePath("~/Music");
-    if (file == "") exit(1);
+    if (file.empty()) exit(1);
 #else
     fs::path file("/Users/bryce/Documents/Dev/Ribbons/assets/audio.mp3");
 #endif
 
     mProcessor.init(ci::DataSourcePath::create(file));
     mRibbons.setProcessor(&mProcessor);
+    mPitchCircle.setProcessor(&mProcessor);
+    mStarfield.setProcessor(&mProcessor);
 
     mProcessor.start();
 }
@@ -192,6 +208,29 @@ void RibbonsApp::keyDown(KeyEvent e) {
         case KeyEvent::KEY_ESCAPE:
             shutdown();
             quit();
+            break;
+
+        // Night mode toggle
+        case KeyEvent::KEY_n: {
+            mIsNightModeEnabled = !mIsNightModeEnabled;
+            ColorA prevColor = mClearColor;
+            if (mIsNightModeEnabled)
+                mClearColor = NIGHT_CLEAR_COLOR;
+            else
+                mClearColor = ColorA::white();
+
+            mClearColorAnim = prevColor;
+            timeline().apply(&mClearColorAnim, mClearColor, 0.5f);
+
+            // Night stars opacity
+            mNightModeOpacityAnim = mIsNightModeEnabled ? 0.0f : 1.0f;
+            timeline().apply(&mNightModeOpacityAnim, mIsNightModeEnabled ? 1.0f : 0.0f, 0.5f);
+            break;
+        }
+
+        // Trails toggle
+        case KeyEvent::KEY_t:
+            mIsTrailsEnabled = !mIsTrailsEnabled;
             break;
 
 #ifdef VR
@@ -228,6 +267,12 @@ void RibbonsApp::update() {
         beats.push_back(circle);
     }
 
+    mPitchCircle.update(delta);
+
+    if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
+        mStarfield.update(delta);
+    }
+
     mElapsed = now;
 
 #if 0//def VR
@@ -244,11 +289,18 @@ void RibbonsApp::update() {
 #endif
 }
 
+static void clear(ColorA color, bool alpha = false) {
+    color.a = alpha ? TRAILS_ALPHA : 1.0f;
+    gl::color(color);
+    gl::drawSolidRect(Rectf(0, 0, getWindowWidth(), getWindowHeight()));
+}
+
 void RibbonsApp::draw() {
     float vol = mProcessor.getVolume();
-    mCam.setFov(60.0f - vol * 5.0f);
 
     gl::enableAlphaBlending();
+//    gl::enableDepthRead();
+//    gl::enableDepthWrite();
     gl::enable(GL_CULL_FACE);
 
     // undo ovr
@@ -278,8 +330,31 @@ void RibbonsApp::draw() {
         glPushAttrib(GL_VIEWPORT_BIT);
 #endif
 
-    gl::clear(ColorA(1.0f, 1.0f, 1.0f - vol * 0.4f), true);
+    if (mClearColorAnim.isComplete()) {
+        if (mIsNightModeEnabled) {
+        }
+        else {
+            mClearColor.b = 1.0f - vol * 0.4f;
+        }
+
+        clear(mClearColor, mIsTrailsEnabled);
+//        gl::clear(mClearColor, false); // not using depth
+    }
+    else {
+        clear(mClearColorAnim.value(), mIsTrailsEnabled);
+//        gl::clear(mClearColorAnim.value(), false);
+    }
+
     gl::pushMatrices();
+    mCam.setFov(60.0f);
+    gl::setMatrices(mCam);
+
+    if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
+        mStarfield.setOpacity(mNightModeOpacityAnim.value());
+        mStarfield.draw();
+    }
+
+    mCam.setFov(60.0f - vol * 5.0f);
     gl::setMatrices(mCam);
 
     for (auto circle : beats) {
@@ -290,6 +365,8 @@ void RibbonsApp::draw() {
 //    gl::drawSphere(Vec3f::zero(), 50);
 
     mRibbons.draw();
+
+    mPitchCircle.draw();
 
     gl::popMatrices();
 
@@ -323,290 +400,3 @@ void RibbonsApp::shutdown() {
 #endif
 
 CINDER_APP_NATIVE(RibbonsApp, RendererGl)
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#else //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#include "cinder/app/AppNative.h"
-#include "cinder/gl/gl.h"
-
-#include "cinder/Camera.h"
-#include "cinder/gl/Fbo.h"
-#include "cinder/Utilities.h"
-
-#define OVR_OS_MAC
-#include "OVR_CAPI.h"
-#include "OVR_CAPI_GL.h"
-
-using namespace ci;
-using namespace ci::app;
-using namespace std;
-
-class OculusTestApp : public AppNative {
-public:
-    void prepareSettings(Settings *settings);
-    void setup();
-    void mouseDown(MouseEvent event);
-    void keyDown(KeyEvent event);
-    void update();
-    void draw();
-
-private:
-    CameraStereo mCamera;
-    gl::Fbo mFbo;
-
-    ovrHmd mHmd;
-    ovrSizei mEyeRes[2];
-    ovrGLTexture mEyeTex[2];
-    ovrEyeRenderDesc mEyeRdesc[2];
-    ovrPosef mEyePose[2];
-
-private:
-    void createFbo(int width, int height);
-    void render();
-};
-
-void OculusTestApp::prepareSettings(Settings *settings)
-{
-    settings->setWindowSize(1280, 800);
-    settings->setTitle("Stereoscopic Rendering");
-    settings->setFrameRate(300.0f);
-}
-
-void OculusTestApp::setup()
-{
-    // setup the camera
-    mCamera.setEyePoint(Vec3f(0.2f, 1.3f, -11.5f));
-    mCamera.setCenterOfInterestPoint(Vec3f(0.5f, 1.5f, -0.1f));
-    mCamera.setWorldUp(Vec3f(0.0f, -1.0f, 0.0f));
-    mCamera.setFov(60.0f);
-
-    ovr_Initialize();
-    mHmd = ovrHmd_Create(0);
-
-    if (!mHmd)
-    {
-        mHmd = ovrHmd_CreateDebug(ovrHmd_DK2);
-    }
-
-//    if (mHmd)
-//    {
-//        OutputDebugString(L"Got HMD: ");
-//        switch (mHmd->Type) {
-//            case ovrHmd_None:
-//                OutputDebugString(L"None\n");
-//                break;
-//            case ovrHmd_DK1:
-//                OutputDebugString(L"DK1\n");
-//                break;
-//            case ovrHmd_DKHD:
-//                OutputDebugString(L"DKHD\n");
-//                break;
-//            case ovrHmd_DK2:
-//                OutputDebugString(L"DK2\n");
-//                break;
-//            case ovrHmd_Other:
-//                OutputDebugString(L"Other\n");
-//                break;
-//            default:
-//                OutputDebugString(L"Unknown\n");
-//                break;
-//        }
-//    }
-
-    setWindowSize(mHmd->Resolution.w, mHmd->Resolution.h);
-    setWindowPos(mHmd->WindowsPos.x, mHmd->WindowsPos.y);
-
-    ovrHmd_ConfigureTracking(mHmd, ovrTrackingCap_Orientation |
-                             ovrTrackingCap_Position |
-                             ovrTrackingCap_MagYawCorrection, 0);
-
-    ovrSizei eyeRes[2];
-    eyeRes[0] = ovrHmd_GetFovTextureSize(mHmd, ovrEye_Left, mHmd->DefaultEyeFov[0], 1.0);
-    eyeRes[1] = ovrHmd_GetFovTextureSize(mHmd, ovrEye_Right, mHmd->DefaultEyeFov[1], 1.0);
-
-    createFbo(eyeRes[0].w + eyeRes[1].w, ci::math<int>::max(eyeRes[0].h, eyeRes[1].h));
-
-    for (int i = 0; i < 2; i++)
-    {
-        mEyeTex[i].OGL.Header.API = ovrRenderAPI_OpenGL;
-        mEyeTex[i].OGL.Header.TextureSize.w = mFbo.getSize().x;
-        mEyeTex[i].OGL.Header.TextureSize.h = mFbo.getSize().y;
-        mEyeTex[i].OGL.Header.RenderViewport.Pos.x = i == 0 ? 0 : mFbo.getSize().x / 2.0;
-        mEyeTex[i].OGL.Header.RenderViewport.Pos.y = 0;
-        mEyeTex[i].OGL.Header.RenderViewport.Size.w = mFbo.getSize().x / 2.0;
-        mEyeTex[i].OGL.Header.RenderViewport.Size.h = mFbo.getSize().y;
-
-        mEyeTex[i].OGL.TexId = mFbo.getTexture(0).getId();
-    }
-
-    ovrGLConfig cfg;
-    memset(&cfg, 0, sizeof cfg);
-    cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
-    cfg.OGL.Header.RTSize = mHmd->Resolution;
-    cfg.OGL.Header.Multisample = 1;
-    if (mHmd->HmdCaps & ovrHmdCap_ExtendDesktop) {
-        console() << "running in \"extended desktop\" mode" << endl;
-    }
-    else
-    {
-//        HWND sys_win = GetActiveWindow();
-//
-//        cfg.OGL.Window = sys_win;
-//        cfg.OGL.DC = NULL;
-//        cfg.OGL.Window = sys_win;
-//        ovrHmd_AttachToWindow(mHmd, sys_win, NULL, NULL);
-//        console() << "could not initialize" << endl;
-//        console() << "running in \"direct-hmd\" moden" << endl;
-    }
-
-    // enable low-persistence display and dynamic prediction for lattency compensation
-    ovrHmd_SetEnabledCaps(mHmd, ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction);
-
-    ovrEyeRenderDesc eyeRenderDescOut[2];
-    unsigned int dcaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp |
-    ovrDistortionCap_Overdrive;
-
-    if (!ovrHmd_ConfigureRendering(mHmd, &cfg.Config, dcaps, mHmd->DefaultEyeFov, eyeRenderDescOut)) {
-        console() << "failed to configure distortion renderer" << endl;
-    }
-
-}
-
-void OculusTestApp::createFbo(int width, int height)
-{
-    gl::Fbo::Format fmt;
-    fmt.setMagFilter(GL_LINEAR);
-    fmt.setMinFilter(GL_LINEAR);
-    fmt.enableColorBuffer();
-    fmt.enableDepthBuffer();
-    fmt.setSamples(16);
-    fmt.setCoverageSamples(16);
-
-    mFbo = gl::Fbo(width, height, fmt);
-}
-
-void OculusTestApp::mouseDown( MouseEvent event )
-{
-}
-
-void OculusTestApp::keyDown(KeyEvent event)
-{
-    switch (event.getCode())
-    {
-        case KeyEvent::KEY_ESCAPE:
-            if (mHmd) {
-                ovrHmd_Destroy(mHmd);
-            }
-            ovr_Shutdown();
-            quit();
-            break;
-        default:
-            ovrHSWDisplayState state;
-            ovrHmd_GetHSWDisplayState(mHmd, &state);
-            if (state.Displayed)
-            {
-                ovrHmd_DismissHSWDisplay(mHmd);
-            }
-            break;
-    }
-}
-
-void OculusTestApp::update()
-{
-    // Extract Oculus Orientation and Update Camera
-    ovrTrackingState ts = ovrHmd_GetTrackingState(mHmd, ovr_GetTimeInSeconds());
-    ovrPosef pose = ts.HeadPose.ThePose;
-
-    ovrQuatf orientation = pose.Orientation;
-    Quatf ci_quat(orientation.w, orientation.x, orientation.y, orientation.z);
-    mCamera.setOrientation(ci_quat * Quatf(Vec3f(0, 1, 0), M_PI));
-}
-
-void OculusTestApp::draw()
-{
-    Vec2i size = mFbo.getSize();
-//    ovrHmd_BeginFrame(mHmd, 0);
-//    mFbo.bindFramebuffer();
-
-    gl::enableDepthRead();
-    gl::enableDepthWrite();
-
-    // clear out the window with black
-    gl::clear(Color(0, 0.4, 0));
-
-    // store current viewport
-//    glPushAttrib(GL_VIEWPORT_BIT);
-
-    for (int i = 0; i < 2; i++)
-    {
-        ovrEyeType eye = mHmd->EyeRenderOrder[i];
-        if (eye == ovrEye_Left)
-        {
-            // draw to left half of window only
-            gl::setViewport(Area(0, 0, size.x / 2, size.y));
-
-            // render left camera
-            mCamera.enableStereoLeft();
-        }
-        else
-        {
-            // draw to right half of window only
-            gl::setViewport(Area(size.x / 2, 0, size.x, size.y));
-
-            // render right camera
-            mCamera.enableStereoRight();
-        }
-//        mEyePose[i] = ovrHmd_GetEyePose(mHmd, eye);
-
-        render();
-    }
-
-    // restore viewport
-//    glPopAttrib();
-//    mFbo.unbindFramebuffer();
-
-//    ovrHmd_EndFrame(mHmd, mEyePose, &mEyeTex[0].Texture);
-
-    gl::setMatricesWindow(getWindowSize());
-    gl::draw(mFbo.getTexture(0), Rectf(0, 0, getWindowSize().x, getWindowSize().y));
-}
-
-void OculusTestApp::render()
-{
-    // enable 3D rendering
-    gl::enableDepthRead();
-    gl::enableDepthWrite();
-
-    // set 3D camera matrices
-//    gl::pushMatrices();
-    gl::setMatrices(mCamera);
-
-//    // draw grid
-    gl::color(Color(0.8f, 0.8f, 0.8f));
-    for (int i = -100; i <= 100; ++i) {
-        gl::drawLine(Vec3f((float)i, 0, -100), Vec3f((float)i, 0, 100));
-        gl::drawLine(Vec3f(-100, 0, (float)i), Vec3f(100, 0, (float)i));
-    }
-
-    // draw floor
-    gl::enableAlphaBlending();
-    gl::color(ColorA(1, 1, 1, 0.75f));
-    gl::drawCube(Vec3f(0.0f, -0.5f, 0.0f), Vec3f(200.0f, 1.0f, 200.0f));
-
-    gl::color(ColorA(1, 0.5, 0, 0.75f));
-    gl::drawTorus(2.0f, 1.0f);
-    gl::disableAlphaBlending();
-
-
-    // restore 2D rendering
-//    gl::popMatrices();
-    gl::disableDepthWrite();
-    gl::disableDepthRead();
-}
-
-CINDER_APP_NATIVE( OculusTestApp, RendererGl )
-
-#endif

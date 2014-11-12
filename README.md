@@ -4,20 +4,21 @@ A little music visualizer.
 
 ## To do
 
-- ribbons radially outward
-- smooth out amplitude
-- accelerate ribbons proportionally on beat?
-- lines with l/r spectrum along sides or volume history
+- [X] ribbons radially outward
+- [ ] smooth out amplitude
+- [X] accelerate ribbons proportionally on beat?
+- [ ] lines with l/r spectrum along sides or volume history
+- [ ] album art: id3lib.sourceforge.net
 
-## Not showing in ovr
+## OVR Integration
 
-Symptoms
+Not supported with current cinder (not glnext) and ovr 0.4. See https://forum.libcinder.org/topic/oculus-rift-dk2-block
 
 - gl::clear working, but geometry does not draw
 
 Possible Reasons
 
-implement stereocamera?
+- implement stereocamera?
 
 use:
 setWindowSize(mHmd->Resolution.w, mHmd->Resolution.h); //this

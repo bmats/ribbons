@@ -41,7 +41,7 @@ RibbonManager::RibbonManager() {
 
             // Dependent on bin
             ribbon.setWidth(3.0f - b * 0.3f);
-            ribbon.setSpeed(8.0f + b * 0.5f);
+            ribbon.setVel(8.0f + b * 0.5f);
             ribbon.setColor(color);
 
             bin.push_back(ribbon);
@@ -62,14 +62,17 @@ void RibbonManager::update(float delta) {
 
     size_t i = 0;
     for (auto binIt = ribbons.begin(); binIt != ribbons.end(); ++binIt) {
-        float amp = mProcessor->getAmpForBins(i++ * binSize, binSize);
+        float amp = mProcessor->getAmpForBins(i * binSize, binSize);
 
         for (auto ribbonIt = binIt->begin(); ribbonIt != binIt->end(); ++ribbonIt) {
             RibbonMesh &ribbon = *ribbonIt;
             ribbon.setAttr(5.0f, amp * 300.0f, 15.0f);
+//            ribbon.setVel((8.0f + i * 0.5f) + amp * 800.0f);
 
             ribbon.update(delta);
         }
+
+        ++i;
     }
 }
 

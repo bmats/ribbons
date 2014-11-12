@@ -20,7 +20,7 @@ public:
 
     void setColor(ci::Color color);
     void setWidth(float width);
-    void setSpeed(float speed);
+    void setVel(float vel);
     void setAttr(float period, float amplitude, float length);
     void update(float delta);
     void resetPosZ();
@@ -35,7 +35,7 @@ private:
     ci::Color mColor;
     ci::ColorA mDisplayColor;
     ci::Vec3f mPos;
-    float mStartZ, mAngle = 0, mDist, mWidth, mSpeed, mPeriod, mAmp, mLength;
+    float mStartZ, mAngle = 0, mDist, mWidth, mVel, mPeriod, mAmp, mLength;
 };
 
 #endif /* defined(__Ribbons__RibbonMesh__) */
