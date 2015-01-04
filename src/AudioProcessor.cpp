@@ -79,6 +79,10 @@ void AudioProcessor::update(float time) {
     mMaxBin = FREQ_TO_BIN(MAX_FREQ);
 }
 
+void AudioProcessor::setPaused(bool paused) {
+    mFilePlayerNode->setEnabled(!paused);
+}
+
 
 size_t AudioProcessor::getNumBins() const {
     return mMaxBin - mMinBin + 1;

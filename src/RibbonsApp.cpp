@@ -1,4 +1,5 @@
-#undef VR
+#define VR
+#define ENABLE_FILE_CHOOSER
 
 #include "cinder/app/AppNative.h"
 #include "cinder/gl/gl.h"
@@ -12,12 +13,6 @@
 #define OVR_OS_MAC
 #include "OVR.h"
 #include "OVR_CAPI_GL.h"
-#endif
-
-#ifdef _WIN32
-#define WINDOWS_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
 #endif
 
 #include "RibbonsApp.h"
@@ -37,6 +32,7 @@ using namespace ci::app;
 class RibbonsApp : public AppNative {
 public:
     explicit RibbonsApp();
+    ~RibbonsApp();
 
     void prepareSettings(Settings *settings);
     void setup();
@@ -51,7 +47,7 @@ private:
     CameraPersp mCam;
     Vec3f mEye, mCenter, mUp;
     float mElapsed;
-    std::vector<BeatCircle> beats;
+    std::vector<BeatCircle> mBeats;
 
     RibbonManager mRibbons;
     PitchCircle mPitchCircle;
@@ -64,14 +60,17 @@ private:
     bool mIsNightModeEnabled = false;
     Anim<float> mNightModeOpacityAnim;
 
+    bool mIsPaused = false;
     bool mIsTrailsEnabled = false;
 
 #ifdef VR
-    gl::Fbo mFbo[ovrEye_Count];
-    ovrHmd mHmd;
-    OVR::Sizei mRecTexSize[ovrEye_Count];
-    OVR::Sizei mRenderTargetSize;
-    ovrGLTexture mEyeTexture[2];
+    gl::Fbo          *mFbo = nullptr;
+    ovrHmd            mHmd;
+    OVR::Sizei        mRenderTargetSize;
+    OVR::Sizei        mRecTexSize[2];
+    ovrGLTexture      mEyeTexture[2];
+    ovrEyeRenderDesc  mEyeRenderDesc[2];
+    ovrVector3f       mHmdToEyeViewOffset[2];
 #endif
 };
 
@@ -80,15 +79,22 @@ RibbonsApp::RibbonsApp()
       mClearColor(ColorA::white()) {
 }
 
+RibbonsApp::~RibbonsApp() {
+#ifdef VR
+    if (mFbo) {
+        delete mFbo;
+    }
+#endif
+}
+
 void RibbonsApp::prepareSettings(Settings *settings) {
 #ifdef VR
-//    size_t numDisplays = Display::getDisplays().size();
-//    if (numDisplays > 1) {
-//        settings->setDisplay(Display::getDisplays()[numDisplays - 1]);
-//    }
+    // Use the Rift display
+    size_t numDisplays = Display::getDisplays().size();
+    settings->setDisplay(Display::getDisplays()[numDisplays - 1]);
 
     settings->setFullScreen(true);
-    settings->setFrameRate(20.0f);
+    settings->setFrameRate(60.0f);
 #else
     settings->setWindowSize(1024, 768);
     settings->setFrameRate(60.0f);
@@ -96,15 +102,13 @@ void RibbonsApp::prepareSettings(Settings *settings) {
 }
 
 void RibbonsApp::setup() {
-    // Rendering
+    // Setup camera
     mCam.setPerspective(60.0f, getWindowAspectRatio(), 1.0f, 200.0f);
     mCam.setEyePoint(Vec3f(0, 0, CAMERA_DISTANCE));
     mCam.setCenterOfInterestPoint(Vec3f::zero());
 
 #ifdef VR
-    mCam.setFov(60.0f);
-
-    // Rift init
+    // Init Rift
     ovr_Initialize();
     printf("Detected %i HMDs.\n", ovrHmd_Detect());
 
@@ -115,79 +119,65 @@ void RibbonsApp::setup() {
     }
     if (mHmd->ProductName[0] == '\0') {
         printf("HMD detected, display not enabled.\n");
-        exit(1);
     }
 
     printf("Found a %s.\n", mHmd->ProductName);
-
-#ifdef OVR_OS_WIN32
-    ovrHmd_AttachToWindow(mHmd, window, NULL, NULL);
-#endif
 
     ovrHmd_ConfigureTracking(mHmd, ovrTrackingCap_MagYawCorrection |
                              ovrTrackingCap_Orientation |
                              ovrTrackingCap_Position, 0);
 
+    for (int i = 0; i < ovrEye_Count; ++i) {
+        ovrEyeType eye = mHmd->EyeRenderOrder[i];
+        // TODO: how is this scaled down?
+        mRecTexSize[i] = ovrHmd_GetFovTextureSize(mHmd, eye, mHmd->DefaultEyeFov[eye], 1.0f);
+//        mRecTexSize[i] = OVR::Sizei(960, 1080);
+    }
+
+    // Use total width and max height for FBO
+    mRenderTargetSize.w = mRecTexSize[0].w + mRecTexSize[1].w;
+    mRenderTargetSize.h = fmax(mRecTexSize[0].h, mRecTexSize[1].h);
+
     gl::Fbo::Format fboFormat;
     fboFormat.enableColorBuffer();
     fboFormat.enableDepthBuffer();
 //    fboFormat.setSamples(8);
-    fboFormat.setMagFilter(GL_LINEAR);
-    fboFormat.setMinFilter(GL_LINEAR);
-    fboFormat.setSamples(16);
-    fboFormat.setCoverageSamples(16);
 
-//    mRecTexSize[0] = ovrHmd_GetFovTextureSize(mHmd, ovrEye_Left, mHmd->DefaultEyeFov[0], 1.0);
-//    mRecTexSize[1] = ovrHmd_GetFovTextureSize(mHmd, ovrEye_Right, mHmd->DefaultEyeFov[1], 1.0);
+    // Create the FBO
+    mFbo = new gl::Fbo(mRenderTargetSize.w, mRenderTargetSize.h, fboFormat);
 
-//    mFbo[0] = gl::Fbo(mRecTexSize[0].w, mRecTexSize[0].h, fboFormat);
-//    mFbo[1] = gl::Fbo(mRecTexSize[1].w, mRecTexSize[1].h, fboFormat);
+    // Setup the textures using the FBO
+    mEyeTexture[0].OGL.Header.API            = ovrRenderAPI_OpenGL;
+    mEyeTexture[0].OGL.Header.TextureSize    = mRenderTargetSize;
+    mEyeTexture[0].OGL.Header.RenderViewport = OVR::Recti(0, 0, mRecTexSize[0].w, mRecTexSize[0].h);
+    mEyeTexture[0].OGL.TexId                 = mFbo->getTexture().getId();
 
-    for (int i = 0; i < ovrEye_Count; ++i) {
-        ovrEyeType eye = mHmd->EyeRenderOrder[i];
-
-        mRecTexSize[i] = ovrHmd_GetFovTextureSize(mHmd, eye, mHmd->DefaultEyeFov[i], 1.0f);
-        mFbo[i]        = gl::Fbo(mRecTexSize[i].w, mRecTexSize[i].h, fboFormat);
-
-        mEyeTexture[i].OGL.Header.API            = ovrRenderAPI_OpenGL;
-        mEyeTexture[i].OGL.Header.TextureSize    = mRecTexSize[i];
-        mEyeTexture[i].OGL.Header.RenderViewport = OVR::Recti(0, 0, mRecTexSize[i].w, mRecTexSize[i].h);
-        mEyeTexture[i].OGL.TexId                 = mFbo[i].getTexture().getId();
-    }
-
-//    setWindowSize(mHmd->Resolution.w, mHmd->Resolution.h);
-//    setWindowPos(mHmd->WindowsPos.x, mHmd->WindowsPos.y);
-
-    // total width, max height
-    mRenderTargetSize.w = mRecTexSize[0].w + mRecTexSize[1].w;
-    mRenderTargetSize.h = (mRecTexSize[0].h > mRecTexSize[1].h) ? mRecTexSize[0].h : mRecTexSize[1].h;
+    mEyeTexture[1] = mEyeTexture[0];
+    mEyeTexture[1].OGL.Header.RenderViewport = OVR::Recti(mRecTexSize[0].w, 0, mRecTexSize[1].w, mRecTexSize[1].h);
 
     ovrGLConfig cfg;
-    memset(&cfg, 0, sizeof cfg);
-    cfg.OGL.Header.API         = ovrRenderAPI_OpenGL;
-    cfg.OGL.Header.RTSize      = mHmd->Resolution;//mRenderTargetSize;//OVR::Sizei(mHmd->Resolution.w, mHmd->Resolution.h);
-    cfg.OGL.Header.Multisample = 1;
-#ifdef OVR_OS_WIN32
-    cfg.OGL.Window             = ?;
-    cfg.OGL.DC                 = ?;
-#endif
+    cfg.OGL.Header.API            = ovrRenderAPI_OpenGL;
+    cfg.OGL.Header.BackBufferSize = mRenderTargetSize;
+    cfg.OGL.Header.Multisample    = 0;
 
     ovrHmd_SetEnabledCaps(mHmd, ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction);
 
-    ovrEyeRenderDesc eyeRenderDescOut[2];
-
     if (!ovrHmd_ConfigureRendering(mHmd,
                                    &cfg.Config,
-                                   ovrDistortionCap_Chromatic | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive,
+                                   ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette | ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive,
                                    mHmd->DefaultEyeFov,
-                                   eyeRenderDescOut)) {
+                                   mEyeRenderDesc)) {
         printf("ConfigureRendering failed.\n");
         exit(1);
     }
+
+    for (int i = 0; i < 2; ++i) {
+        mHmdToEyeViewOffset[mEyeRenderDesc[i].Eye] = mEyeRenderDesc[i].HmdToEyeViewOffset;
+    }
 #endif // VR
 
-    // Visualizer
-#if 0
+    // Load the file
+#ifdef ENABLE_FILE_CHOOSER
     fs::path file = getOpenFilePath("~/Music");
     if (file.empty()) exit(1);
 #else
@@ -196,13 +186,20 @@ void RibbonsApp::setup() {
 
     mProcessor.init(ci::DataSourcePath::create(file));
     mRibbons.setProcessor(&mProcessor);
-    mPitchCircle.setProcessor(&mProcessor);
+//    mPitchCircle.setProcessor(&mProcessor);
     mStarfield.setProcessor(&mProcessor);
 
     mProcessor.start();
 }
 
 void RibbonsApp::keyDown(KeyEvent e) {
+#ifdef VR
+    // Hide HSW on key press
+    ovrHSWDisplayState state;
+    ovrHmd_GetHSWDisplayState(mHmd, &state);
+    if (state.Displayed) ovrHmd_DismissHSWDisplay(mHmd);
+#endif
+
     switch (e.getCode()) {
         // Exit
         case KeyEvent::KEY_ESCAPE:
@@ -228,19 +225,16 @@ void RibbonsApp::keyDown(KeyEvent e) {
             break;
         }
 
+        // Pause
+        case KeyEvent::KEY_p:
+            mIsPaused = !mIsPaused;
+            mProcessor.setPaused(mIsPaused);
+            break;
+
         // Trails toggle
         case KeyEvent::KEY_t:
             mIsTrailsEnabled = !mIsTrailsEnabled;
             break;
-
-#ifdef VR
-        default:
-            // Hide HSW on key press
-            ovrHSWDisplayState state;
-            ovrHmd_GetHSWDisplayState(mHmd, &state);
-            if (state.Displayed) ovrHmd_DismissHSWDisplay(mHmd);
-            break;
-#endif
     }
 }
 
@@ -248,45 +242,35 @@ void RibbonsApp::update() {
     float now = getElapsedSeconds();
     float delta = now - mElapsed;
 
-//    mCam.lookAt(Vec3f(sinf(now * 4) * 8, 0, CAMERA_DISTANCE), Vec3f::zero());
+    if (!mIsPaused) {
+        // Update all of the objects
 
-    mProcessor.update(now);
-    mRibbons.update(delta);
+        mProcessor.update(now);
+        mRibbons.update(delta);
 
-    for (size_t i = 0; i < beats.size(); ++i) {
-        BeatCircle &beat = beats.at(i);
-        beat.update(delta);
-        if (beat.isDone()) {
-            beats.erase(beats.begin() + i);
-            --i;
+        for (size_t i = 0; i < mBeats.size(); ++i) {
+            BeatCircle &beat = mBeats.at(i);
+            beat.update(delta);
+            if (beat.isDone()) {
+                mBeats.erase(mBeats.begin() + i);
+                --i;
+            }
+        }
+
+//        mPitchCircle.update(delta);
+
+        if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
+            mStarfield.update(delta);
+        }
+
+        // Add beats
+        if (mProcessor.isBeat()) {
+            BeatCircle circle;
+            mBeats.push_back(circle);
         }
     }
 
-    if (mProcessor.isBeat()) {
-        BeatCircle circle;
-        beats.push_back(circle);
-    }
-
-    mPitchCircle.update(delta);
-
-    if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
-        mStarfield.update(delta);
-    }
-
     mElapsed = now;
-
-#if 0//def VR
-    // Update camera position
-    ovrTrackingState ts = ovrHmd_GetTrackingState(mHmd, ovr_GetTimeInSeconds());
-
-    if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
-        OVR::Posef pose = ts.HeadPose.ThePose;
-
-        OVR::Quatf rot = pose.Rotation;
-        Quatf ci_quat(rot.w, rot.x, rot.y, rot.z);
-        mCam.setOrientation(ci_quat * Quatf(Vec3f(0, 1, 0), M_PI));
-    }
-#endif
 }
 
 static void clear(ColorA color, bool alpha = false) {
@@ -303,90 +287,86 @@ void RibbonsApp::draw() {
 //    gl::enableDepthWrite();
     gl::enable(GL_CULL_FACE);
 
-    // undo ovr
-//    gl::enable(GL_FRAMEBUFFER_SRGB); // or alt
-//    gl::enable(GL_CULL_FACE);
-//    gl::enable(GL_DEPTH_TEST);
-//    gl::enable(GL_BLEND);
-//    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-//    gl::enable(GL_DITHER);
-////    gl::enable(GL_RASTERIZER_DISCARD);
-//    gl::enable(GL_SAMPLE_MASK);
-
 #ifdef VR
-    gl::clear(Color(0, 0, 0));
-
     ovrHmd_BeginFrame(mHmd, 0);
 
     ovrPosef headPose[2];
+    ovrHmd_GetEyePoses(mHmd, 0, mHmdToEyeViewOffset, headPose, nullptr);
+
+    Area prevViewport = gl::getViewport();
+
+    mFbo->bindFramebuffer();
 
     for (int i = 0; i < ovrEye_Count; ++i) { // get it... i... haha
         ovrEyeType eye = mHmd->EyeRenderOrder[i];
-        headPose[i] = ovrHmd_GetEyePose(mHmd, eye);
 
-        mFbo[i].bindFramebuffer();
-        gl::enableDepthRead();
-        gl::enableDepthWrite();
-        glPushAttrib(GL_VIEWPORT_BIT);
+        ovrRecti *view = &mEyeTexture[eye].OGL.Header.RenderViewport;
+        ovrPosef *pose = &headPose[eye];
+
+        // Set camera orientation
+        ovrQuatf *rot = &headPose[eye].Orientation;
+        mCam.setOrientation(Quatf(rot->w, rot->x, rot->y, rot->z) * Quatf(Vec3f(0, 1, 0), 0));
+
+        // Set camera position
+        // TODO: fix position scaling
+        Vec3f eyePointOffset = Vec3f(pose->Position.x, pose->Position.y, pose->Position.z) * 2.0f;
+        mCam.setEyePoint(Vec3f(0, 0, CAMERA_DISTANCE) + eyePointOffset);
+
+        // Configure camera properties
+        mCam.setAspectRatio(view->Size.h / view->Size.w);
+        mCam.setFov((atanf(mEyeRenderDesc[eye].Fov.LeftTan) + atanf(mEyeRenderDesc[eye].Fov.RightTan)) * 180.0f / M_PI);
+        gl::setViewport(Area(view->Pos.x, view->Pos.y, view->Pos.x + view->Size.w, view->Pos.y + view->Size.h));
+
+//        gl::enableDepthRead();
+//        gl::enableDepthWrite();
+//        glPushAttrib(GL_VIEWPORT_BIT);
 #endif
 
-    if (mClearColorAnim.isComplete()) {
-        if (mIsNightModeEnabled) {
+        // Clear
+        if (mClearColorAnim.isComplete()) {
+            if (mIsNightModeEnabled) {
+            }
+            else {
+                mClearColor.b = 1.0f - vol * 0.4f;
+            }
+
+            clear(mClearColor, mIsTrailsEnabled);
         }
         else {
-            mClearColor.b = 1.0f - vol * 0.4f;
+            clear(mClearColorAnim.value(), mIsTrailsEnabled);
         }
 
-        clear(mClearColor, mIsTrailsEnabled);
-//        gl::clear(mClearColor, false); // not using depth
-    }
-    else {
-        clear(mClearColorAnim.value(), mIsTrailsEnabled);
-//        gl::clear(mClearColorAnim.value(), false);
-    }
+        gl::pushMatrices();
+        gl::setMatrices(mCam);
 
-    gl::pushMatrices();
-    mCam.setFov(60.0f);
-    gl::setMatrices(mCam);
+        if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
+            mStarfield.setOpacity(mNightModeOpacityAnim.value());
+            mStarfield.draw();
+        }
 
-    if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
-        mStarfield.setOpacity(mNightModeOpacityAnim.value());
-        mStarfield.draw();
-    }
+#ifndef VR
+        // "Pulse" with the volume, but this wouldn't work with a HMD
+        mCam.setFov(60.0f - vol * 5.0f);
+        gl::setMatrices(mCam);
+#endif
 
-    mCam.setFov(60.0f - vol * 5.0f);
-    gl::setMatrices(mCam);
+        for (auto circle : mBeats) {
+            gl::draw(circle.getMesh());
+        }
 
-    for (auto circle : beats) {
-        gl::draw(circle.getMesh());
-    }
+        mRibbons.draw();
 
-//    gl::color(1, 0, 0);
-//    gl::drawSphere(Vec3f::zero(), 50);
+//        mPitchCircle.draw();
 
-    mRibbons.draw();
-
-    mPitchCircle.draw();
-
-    gl::popMatrices();
+        gl::popMatrices();
 
 #ifdef VR
-//        Surface s(mFbo[i].getTexture());
-//        Color avg = s.areaAverage(Area(0, 0, s.getWidth(), s.getHeight()));
-//        printf("%f %f %f\n", avg.r, avg.g, avg.b);
-
-        gl::disableDepthWrite();
-        gl::disableDepthRead();
-        glPopAttrib();
-        mFbo[i].unbindFramebuffer();
     }
-
+    
+    mFbo->unbindFramebuffer();
+    gl::setViewport(prevViewport);
+    
     ovrHmd_EndFrame(mHmd, headPose, &mEyeTexture[0].Texture);
-
-//    gl::setMatricesWindow(getWindowSize());
-//    if (mFbo[0].getTexture())
-//        gl::draw(mFbo[0].getTexture(), Rectf(0, 0, mFbo[0].getTexture().getWidth(), mFbo[0].getTexture().getHeight()));
-//    gl::draw(mFbo[1].getTexture(), Rectf(mFbo[0].getTexture().getWidth(), 0, mFbo[1].getTexture().getWidth(), mFbo[1].getTexture().getHeight()));
 #endif
 }
 

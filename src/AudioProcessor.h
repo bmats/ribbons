@@ -26,6 +26,7 @@ public:
     bool init(const ci::DataSourceRef dataSource);
     void start();
     void update(float time);
+    void setPaused(bool paused);
 
     size_t getNumBins() const;
     size_t getSampleRate() const;
