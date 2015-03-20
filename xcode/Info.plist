@@ -7,9 +7,9 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>CinderApp.icns</string>
+	<string>Ribbons.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>brycem.$(PRODUCT_NAME:rfc1034identifier)</string>
+	<string>bmats.$(PRODUCT_NAME:rfc1034identifier)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

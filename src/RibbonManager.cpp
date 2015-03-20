@@ -12,7 +12,11 @@
 #include "RibbonsApp.h"
 
 #define NUM_BIN_GROUPS 8
-#define RIBBONS_PER_BIN 6
+#if VR
+# define RIBBONS_PER_BIN 12
+#else
+# define RIBBONS_PER_BIN 6
+#endif
 
 static ci::Color getColorForBin(float bin) {
     bin *= 15.0f;
@@ -26,17 +30,14 @@ static ci::Color getColorForBin(float bin) {
 RibbonManager::RibbonManager() {
     for (uint b = 0; b < NUM_BIN_GROUPS; ++b) {
         RibbonBin bin;
-//        ci::Color color(
-//                        fmod(0.3f + b * 0.5f, 1),
-//                        fmod(0.1f + b * 0.2f, 1),
-//                        fmod(0.2f + b * 0.8f, 1));
-//        ci::Color color(
-//                        ((float)b / NUM_BIN_GROUPS) * 0.3f,
-//                        ((float)b / NUM_BIN_GROUPS) * 0.6f,
-//                        ((float)b / NUM_BIN_GROUPS) * 1.0f);
         ci::Color color = getColorForBin(b);
 
-        for (uint r = 0; r < RIBBONS_PER_BIN + b * 2; ++r) {
+        uint maxRibbons = RIBBONS_PER_BIN + b * 2;
+#if VR
+        maxRibbons *= 2;
+#endif
+
+        for (uint r = 0; r < maxRibbons; ++r) {
             RibbonMesh ribbon;
 
             // Dependent on bin

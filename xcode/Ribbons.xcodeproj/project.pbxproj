@@ -12,15 +12,16 @@
 		00B784B40FF439BC000DE1D7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B00FF439BC000DE1D7 /* AudioToolbox.framework */; };
 		00B784B50FF439BC000DE1D7 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B10FF439BC000DE1D7 /* AudioUnit.framework */; };
 		00B784B60FF439BC000DE1D7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00B784B20FF439BC000DE1D7 /* CoreAudio.framework */; };
+		0237623E1AB683F90001A611 /* Ribbons.iconset in Resources */ = {isa = PBXBuildFile; fileRef = 0237623D1AB683F90001A611 /* Ribbons.iconset */; };
+		025A4C2A1AB6952600917CFF /* libovr.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0266C0681A588BD0004C0A6C /* libovr.a */; };
+		025A4C2B1AB6953000917CFF /* libcinder_d.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 025A4C231AB68BE600917CFF /* libcinder_d.a */; };
 		02644D391A11ADCF00937F23 /* PitchCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02644D371A11ADCF00937F23 /* PitchCircle.cpp */; };
-		0266C0691A588EFB004C0A6C /* libovr.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0266C0681A588BD0004C0A6C /* libovr.a */; };
 		027794F519D7DEBD0086BF1A /* RibbonMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 027794F319D7DEBD0086BF1A /* RibbonMesh.cpp */; };
 		027794F819D893700086BF1A /* RibbonManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 027794F619D893700086BF1A /* RibbonManager.cpp */; };
 		029D20611A13308E0080E196 /* Starfield.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 029D205F1A13308E0080E196 /* Starfield.cpp */; };
 		02A24D8C19E9047600CBD22F /* BeatCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02A24D8A19E9047600CBD22F /* BeatCircle.cpp */; };
 		02EB0FC719E102130039C969 /* AudioProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FC519E102130039C969 /* AudioProcessor.cpp */; };
 		02EB0FCE19E7AE140039C969 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 02EB0FCC19E7AE140039C969 /* README.md */; };
-		1F9B89BD76C84C92AE506B0A /* CinderApp.icns in Resources */ = {isa = PBXBuildFile; fileRef = 37863447DF5B4E578DDC6966 /* CinderApp.icns */; };
 		5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B10EAFCA74003A9687 /* CoreVideo.framework */; };
 		5323E6B60EAFCA7E003A9687 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5323E6B50EAFCA7E003A9687 /* QTKit.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -28,6 +29,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		025A4C221AB68BE600917CFF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 029F8F2D1AB660020012733C /* cinder.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC07E0554694100DB518D;
+			remoteInfo = cinder;
+		};
+		025A4C241AB68BE600917CFF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 029F8F2D1AB660020012733C /* cinder.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 007050BE1114F93F003FCAE4;
+			remoteInfo = cinder_iphone;
+		};
+		025A4C261AB68BE600917CFF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 029F8F2D1AB660020012733C /* cinder.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 00CFD9E11135C3520091E310;
+			remoteInfo = cinder_iphone_sim;
+		};
 		0266C0671A588BD0004C0A6C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0266C0631A588BCF004C0A6C /* LibOVR.xcodeproj */;
@@ -43,6 +65,7 @@
 		00B784B00FF439BC000DE1D7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		00B784B10FF439BC000DE1D7 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		00B784B20FF439BC000DE1D7 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		0237623D1AB683F90001A611 /* Ribbons.iconset */ = {isa = PBXFileReference; lastKnownFileType = folder.iconset; name = Ribbons.iconset; path = ../resources/Ribbons.iconset; sourceTree = "<group>"; };
 		02644D371A11ADCF00937F23 /* PitchCircle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PitchCircle.cpp; path = ../src/PitchCircle.cpp; sourceTree = "<group>"; };
 		02644D381A11ADCF00937F23 /* PitchCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PitchCircle.h; path = ../src/PitchCircle.h; sourceTree = "<group>"; };
 		0266C0631A588BCF004C0A6C /* LibOVR.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = LibOVR.xcodeproj; path = ../../../../OculusSDK/LibOVR/Projects/Mac/Xcode/LibOVR.xcodeproj; sourceTree = "<group>"; };
@@ -52,8 +75,10 @@
 		027794F719D893700086BF1A /* RibbonManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RibbonManager.h; path = ../src/RibbonManager.h; sourceTree = "<group>"; };
 		029D205F1A13308E0080E196 /* Starfield.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Starfield.cpp; path = ../src/Starfield.cpp; sourceTree = "<group>"; };
 		029D20601A13308E0080E196 /* Starfield.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Starfield.h; path = ../src/Starfield.h; sourceTree = "<group>"; };
+		029F8F2D1AB660020012733C /* cinder.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = cinder.xcodeproj; path = ../../../../cinder/xcode/cinder.xcodeproj; sourceTree = "<group>"; };
 		02A24D8A19E9047600CBD22F /* BeatCircle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BeatCircle.cpp; path = ../src/BeatCircle.cpp; sourceTree = "<group>"; };
 		02A24D8B19E9047600CBD22F /* BeatCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BeatCircle.h; path = ../src/BeatCircle.h; sourceTree = "<group>"; };
+		02BD75461AB689E40088DA70 /* libcinder_d.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcinder_d.a; path = ../../../../cinder/lib/libcinder_d.a; sourceTree = "<group>"; };
 		02EB0FC519E102130039C969 /* AudioProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AudioProcessor.cpp; path = ../src/AudioProcessor.cpp; sourceTree = "<group>"; };
 		02EB0FC619E102130039C969 /* AudioProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioProcessor.h; path = ../src/AudioProcessor.h; sourceTree = "<group>"; };
 		02EB0FCB19E646830039C969 /* RibbonsApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RibbonsApp.h; path = ../src/RibbonsApp.h; sourceTree = "<group>"; };
@@ -62,7 +87,6 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2A8EFC75D432474AA0FA9408 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		37863447DF5B4E578DDC6966 /* CinderApp.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = CinderApp.icns; path = ../resources/CinderApp.icns; sourceTree = "<group>"; };
 		5323E6B10EAFCA74003A9687 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = /System/Library/Frameworks/CoreVideo.framework; sourceTree = "<absolute>"; };
 		5323E6B50EAFCA7E003A9687 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		69C0EA94437F4A37BC146E1F /* Resources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Resources.h; path = ../include/Resources.h; sourceTree = "<group>"; };
@@ -76,7 +100,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0266C0691A588EFB004C0A6C /* libovr.a in Frameworks */,
+				025A4C2B1AB6953000917CFF /* libcinder_d.a in Frameworks */,
+				025A4C2A1AB6952600917CFF /* libovr.a in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				0091D8F90E81B9330029341E /* OpenGL.framework in Frameworks */,
 				5323E6B20EAFCA74003A9687 /* CoreVideo.framework in Frameworks */,
@@ -96,6 +121,16 @@
 			children = (
 			);
 			name = Blocks;
+			sourceTree = "<group>";
+		};
+		025A4C1D1AB68BE600917CFF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				025A4C231AB68BE600917CFF /* libcinder_d.a */,
+				025A4C251AB68BE600917CFF /* libcinder-iphone_d.a */,
+				025A4C271AB68BE600917CFF /* libcinder-iphone-sim_d.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		0266C0641A588BCF004C0A6C /* Products */ = {
@@ -155,6 +190,7 @@
 		29B97314FDCFA39411CA2CEA /* Ribbons */ = {
 			isa = PBXGroup;
 			children = (
+				029F8F2D1AB660020012733C /* cinder.xcodeproj */,
 				0266C0631A588BCF004C0A6C /* LibOVR.xcodeproj */,
 				02EB0FCC19E7AE140039C969 /* README.md */,
 				01B97315FEAEA392516A2CEA /* Blocks */,
@@ -186,7 +222,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				37863447DF5B4E578DDC6966 /* CinderApp.icns */,
+				0237623D1AB683F90001A611 /* Ribbons.iconset */,
 				2A8EFC75D432474AA0FA9408 /* Info.plist */,
 			);
 			name = Resources;
@@ -195,6 +231,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				02BD75461AB689E40088DA70 /* libcinder_d.a */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -229,6 +266,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0600;
+				ORGANIZATIONNAME = "Bryce Matsumori";
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Ribbons" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -244,6 +282,10 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
+					ProductGroup = 025A4C1D1AB68BE600917CFF /* Products */;
+					ProjectRef = 029F8F2D1AB660020012733C /* cinder.xcodeproj */;
+				},
+				{
 					ProductGroup = 0266C0641A588BCF004C0A6C /* Products */;
 					ProjectRef = 0266C0631A588BCF004C0A6C /* LibOVR.xcodeproj */;
 				},
@@ -256,6 +298,27 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		025A4C231AB68BE600917CFF /* libcinder_d.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libcinder_d.a;
+			remoteRef = 025A4C221AB68BE600917CFF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		025A4C251AB68BE600917CFF /* libcinder-iphone_d.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libcinder-iphone_d.a";
+			remoteRef = 025A4C241AB68BE600917CFF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		025A4C271AB68BE600917CFF /* libcinder-iphone-sim_d.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libcinder-iphone-sim_d.a";
+			remoteRef = 025A4C261AB68BE600917CFF /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		0266C0681A588BD0004C0A6C /* libovr.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -270,7 +333,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F9B89BD76C84C92AE506B0A /* CinderApp.icns in Resources */,
+				0237623E1AB683F90001A611 /* Ribbons.iconset in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +361,7 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CINDER_PATH = "~/cinder";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
@@ -310,15 +374,20 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = (
+					"VR=1",
+					"ENABLE_FILE_CHOOSER=1",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBOVR_PATH = "~/OculusSDK/LibOVR/";
-				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder_d.a\"";
+				LIBOVR_PATH = "~/OculusSDK/LibOVR";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/bryce/cinder/lib,
+				);
 				PRODUCT_NAME = Ribbons;
 				SYMROOT = ./build;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include $(LIBOVR_PATH)/Include $(LIBOVR_PATH)/Src";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -326,6 +395,7 @@
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CINDER_PATH = "~/cinder";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -339,16 +409,21 @@
 					"NDEBUG=1",
 					"$(inherited)",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = (
+					"VR=1",
+					"ENABLE_FILE_CHOOSER=1",
+				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBOVR_PATH = "~/OculusSDK/LibOVR/";
-				OTHER_LDFLAGS = "\"$(CINDER_PATH)/lib/libcinder.a\"";
+				LIBOVR_PATH = "~/OculusSDK/LibOVR";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/bryce/cinder/lib,
+				);
 				PRODUCT_NAME = Ribbons;
 				STRIP_INSTALLED_PRODUCT = YES;
 				SYMROOT = ./build;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include $(LIBOVR_PATH)/Include $(LIBOVR_PATH)/Src";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -357,17 +432,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CINDER_PATH = ../../../../cinder;
+				CINDER_PATH = "~/cinder";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
-				LIBOVR_PATH = "~/oculus/OculusSDK/LibOVR/";
+				LIBOVR_PATH = "~/OculusSDK/LibOVR";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include $(LIBOVR_PATH)/Include $(LIBOVRPATH)/Src";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" $(LIBOVR_PATH)/Include $(LIBOVR_PATH)/Src ../include";
 			};
 			name = Debug;
 		};
@@ -375,16 +450,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CINDER_PATH = ../../../../cinder;
+				CINDER_PATH = "~/cinder";
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/boost\"";
-				LIBOVR_PATH = "~/oculus/OculusSDK/LibOVR/";
+				LIBOVR_PATH = "~/OculusSDK/LibOVR";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				SDKROOT = macosx;
-				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" ../include $(LIBOVR_PATH)/Include $(LIBOVRPATH)/Src";
+				USER_HEADER_SEARCH_PATHS = "\"$(CINDER_PATH)/include\" $(LIBOVR_PATH)/Include $(LIBOVR_PATH)/Src ../include";
 			};
 			name = Release;
 		};

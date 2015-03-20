@@ -2,6 +2,8 @@
 
 A little music visualizer with Oculus Rift support.
 
+Turn VR support on and off by changing `VR=1` to `VR=0` or vice versa in Build Settings > "Preprocessor Macros Not Used In Precompiled Headers".
+
 ## To do
 
 - [X] ribbons radially outward
@@ -11,11 +13,8 @@ A little music visualizer with Oculus Rift support.
 - [ ] album art: id3lib.sourceforge.net
 - [ ] use speaker output
 
-## OVR To do
+### OVR
 
-- image size is too big
-- fix incorrect zindexing
-- ovr shutdown throws exception
-- fix scaling of position
-- show stars all around
-- ribbons shouldn't disappear behind you, so have them continue and fade out
+- [ ] show stars all around
+- [ ] ovrHmd_GetFovTextureSize is too big: scale down for rendering (use display size?)
+- [ ] ovr shutdown throws exception: ovrHmd_Destroy is called between ovrHmd_BeginFrame and ovrHmd_EndFrame

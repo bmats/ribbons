@@ -1,6 +1,3 @@
-#define VR
-#define ENABLE_FILE_CHOOSER
-
 #include "cinder/app/AppNative.h"
 #include "cinder/gl/gl.h"
 #include "cinder/Camera.h"
@@ -8,15 +5,15 @@
 #include "cinder/TriMesh.h"
 #include "cinder/DataSource.h"
 #include "cinder/Timeline.h"
-
-#ifdef VR
-#define OVR_OS_MAC
-#include "OVR.h"
-#include "OVR_CAPI_GL.h"
-#endif
-
 #include "RibbonsApp.h"
 #include "Resources.h"
+
+#if VR
+# define OVR_OS_MAC
+# include "OVR.h"
+# include "OVR_CAPI_GL.h"
+#endif
+
 #include "RibbonManager.h"
 #include "AudioProcessor.h"
 #include "BeatCircle.h"
@@ -39,7 +36,7 @@ public:
     void keyDown(KeyEvent event);
     void update();
     void draw();
-#ifdef VR
+#if VR
     void shutdown();
 #endif
 
@@ -63,7 +60,7 @@ private:
     bool mIsPaused = false;
     bool mIsTrailsEnabled = false;
 
-#ifdef VR
+#if VR
     gl::Fbo          *mFbo = nullptr;
     ovrHmd            mHmd;
     OVR::Sizei        mRenderTargetSize;
@@ -80,7 +77,7 @@ RibbonsApp::RibbonsApp()
 }
 
 RibbonsApp::~RibbonsApp() {
-#ifdef VR
+#if VR
     if (mFbo) {
         delete mFbo;
     }
@@ -88,7 +85,7 @@ RibbonsApp::~RibbonsApp() {
 }
 
 void RibbonsApp::prepareSettings(Settings *settings) {
-#ifdef VR
+#if VR
     // Use the Rift display
     size_t numDisplays = Display::getDisplays().size();
     settings->setDisplay(Display::getDisplays()[numDisplays - 1]);
@@ -107,7 +104,7 @@ void RibbonsApp::setup() {
     mCam.setEyePoint(Vec3f(0, 0, CAMERA_DISTANCE));
     mCam.setCenterOfInterestPoint(Vec3f::zero());
 
-#ifdef VR
+#if VR
     // Init Rift
     ovr_Initialize();
     printf("Detected %i HMDs.\n", ovrHmd_Detect());
@@ -130,8 +127,8 @@ void RibbonsApp::setup() {
     for (int i = 0; i < ovrEye_Count; ++i) {
         ovrEyeType eye = mHmd->EyeRenderOrder[i];
         // TODO: how is this scaled down?
-        mRecTexSize[i] = ovrHmd_GetFovTextureSize(mHmd, eye, mHmd->DefaultEyeFov[eye], 1.0f);
-//        mRecTexSize[i] = OVR::Sizei(960, 1080);
+//        mRecTexSize[i] = ovrHmd_GetFovTextureSize(mHmd, eye, mHmd->DefaultEyeFov[eye], 1.0f);
+        mRecTexSize[i] = OVR::Sizei(960, 1080);
     }
 
     // Use total width and max height for FBO
@@ -177,11 +174,11 @@ void RibbonsApp::setup() {
 #endif // VR
 
     // Load the file
-#ifdef ENABLE_FILE_CHOOSER
+#if ENABLE_FILE_CHOOSER
     fs::path file = getOpenFilePath("~/Music");
     if (file.empty()) exit(1);
 #else
-    fs::path file("/Users/bryce/Documents/Dev/Ribbons/assets/audio.mp3");
+    fs::path file("../../../assets/audio.mp3");
 #endif
 
     mProcessor.init(ci::DataSourcePath::create(file));
@@ -193,7 +190,7 @@ void RibbonsApp::setup() {
 }
 
 void RibbonsApp::keyDown(KeyEvent e) {
-#ifdef VR
+#if VR
     // Hide HSW on key press
     ovrHSWDisplayState state;
     ovrHmd_GetHSWDisplayState(mHmd, &state);
@@ -280,14 +277,18 @@ static void clear(ColorA color, bool alpha = false) {
 }
 
 void RibbonsApp::draw() {
+#if !VR
     float vol = mProcessor.getVolume();
+#endif
 
     gl::enableAlphaBlending();
-//    gl::enableDepthRead();
-//    gl::enableDepthWrite();
     gl::enable(GL_CULL_FACE);
 
-#ifdef VR
+#if VR
+    // Use depth
+    gl::enableDepthRead();
+    gl::enableDepthWrite();
+    
     ovrHmd_BeginFrame(mHmd, 0);
 
     ovrPosef headPose[2];
@@ -316,10 +317,6 @@ void RibbonsApp::draw() {
         mCam.setAspectRatio(view->Size.h / view->Size.w);
         mCam.setFov((atanf(mEyeRenderDesc[eye].Fov.LeftTan) + atanf(mEyeRenderDesc[eye].Fov.RightTan)) * 180.0f / M_PI);
         gl::setViewport(Area(view->Pos.x, view->Pos.y, view->Pos.x + view->Size.w, view->Pos.y + view->Size.h));
-
-//        gl::enableDepthRead();
-//        gl::enableDepthWrite();
-//        glPushAttrib(GL_VIEWPORT_BIT);
 #endif
 
         // Clear
@@ -327,7 +324,9 @@ void RibbonsApp::draw() {
             if (mIsNightModeEnabled) {
             }
             else {
+#if !VR
                 mClearColor.b = 1.0f - vol * 0.4f;
+#endif
             }
 
             clear(mClearColor, mIsTrailsEnabled);
@@ -336,31 +335,41 @@ void RibbonsApp::draw() {
             clear(mClearColorAnim.value(), mIsTrailsEnabled);
         }
 
+        // Clear depth buffer
+        glDepthMask(GL_TRUE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
         gl::pushMatrices();
         gl::setMatrices(mCam);
+
+#if !VR
+        // "Pulse" with the volume, but this wouldn't work with a HMD
+        mCam.setFov(60.0f - vol * 5.0f);
+        gl::setMatrices(mCam);
+#endif
+
+        mRibbons.draw();
+
+        for (auto circle : mBeats) {
+            gl::draw(circle.getMesh());
+        }
+
+#if !VR
+        // Undo FOV change for background
+        mCam.setFov(60.0f);
+        gl::setMatrices(mCam);
+#endif
 
         if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
             mStarfield.setOpacity(mNightModeOpacityAnim.value());
             mStarfield.draw();
         }
 
-#ifndef VR
-        // "Pulse" with the volume, but this wouldn't work with a HMD
-        mCam.setFov(60.0f - vol * 5.0f);
-        gl::setMatrices(mCam);
-#endif
-
-        for (auto circle : mBeats) {
-            gl::draw(circle.getMesh());
-        }
-
-        mRibbons.draw();
-
 //        mPitchCircle.draw();
 
         gl::popMatrices();
 
-#ifdef VR
+#if VR
     }
     
     mFbo->unbindFramebuffer();
@@ -370,7 +379,7 @@ void RibbonsApp::draw() {
 #endif
 }
 
-#ifdef VR
+#if VR
 void RibbonsApp::shutdown() {
     if (mHmd) {
         ovrHmd_Destroy(mHmd);

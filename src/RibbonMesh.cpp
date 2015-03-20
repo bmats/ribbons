@@ -6,7 +6,7 @@
 //
 //
 
-#undef RADIAL_RIBBONS
+//#define RADIAL_RIBBONS 1
 
 #include "RibbonMesh.h"
 #include "RibbonsApp.h"
@@ -33,7 +33,11 @@ void RibbonMesh::reset() {
 
     mPos.x = cosf(mAngle) * mDist;
     mPos.y = sinf(mAngle) * mDist;
+#if VR
+    mPos.z = randf() * -CAMERA_DISTANCE * 2;
+#else
     mPos.z = randf() * -CAMERA_DISTANCE;
+#endif
 
     mStartZ = mPos.z;
 }
@@ -59,22 +63,28 @@ void RibbonMesh::setAttr(float period, float amplitude, float length) {
 void RibbonMesh::update(float delta) {
     mPos.z += mVel * delta;
 
+#if VR
+    if (mPos.z - mLength > CAMERA_DISTANCE * 2) {
+#else
     if (mPos.z - mLength > CAMERA_DISTANCE) {
+#endif
         reset();
     }
 
-    // Fade the color in if necessary over a distance from white
-    if (mPos.z - mStartZ > FADE_IN_DIST) {
+    // Fade the color in or out over a distance from white
+    if (mPos.z < FADE_IN_DIST) {
+        mDisplayColor = ci::ColorA(mColor, (mPos.z - mStartZ) / FADE_IN_DIST);
+    }
+    else if ((CAMERA_DISTANCE * 2) - mPos.z < FADE_IN_DIST) {
+        mDisplayColor = ci::ColorA(mColor, ((CAMERA_DISTANCE * 2) - mPos.z) / FADE_IN_DIST);
+    }
+    else {
         mDisplayColor = mColor;
     }
-    else
-        mDisplayColor = ci::ColorA(mColor, (mPos.z - mStartZ) / FADE_IN_DIST);
 
     // Build mesh
     int nQuads = (int)roundf(mLength * RIBBON_QUAD_PER_LENGTH);
     float quadLen = mLength / nQuads;
-
-//    float slope = -1.0f/tanf(mAngle); // perp to radius
 
     mMesh.clear();
 
@@ -83,7 +93,7 @@ void RibbonMesh::update(float delta) {
               nextYOff = mAmp * sinf((mPos.z + (nQuads - i - 1) * quadLen) * M_PI / mPeriod);
         size_t idx = mMesh.getNumVertices();
 
-#ifdef RADIAL_RIBBONS
+#if RADIAL_RIBBONS
         ci::Vec3f quadCenter(cosf(mAngle) * (mDist + yOff),
                              sinf(mAngle) * (mDist + yOff),
                              mPos.z - i * quadLen);
