@@ -200,7 +200,6 @@ void RibbonsApp::keyDown(KeyEvent e) {
     switch (e.getCode()) {
         // Exit
         case KeyEvent::KEY_ESCAPE:
-            shutdown();
             quit();
             break;
 

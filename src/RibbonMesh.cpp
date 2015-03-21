@@ -6,8 +6,6 @@
 //
 //
 
-//#define RADIAL_RIBBONS 1
-
 #include "RibbonMesh.h"
 #include "RibbonsApp.h"
 #include "cinder/Rand.h"
@@ -62,6 +60,7 @@ void RibbonMesh::setAttr(float period, float amplitude, float length) {
 }
 
 void RibbonMesh::update(float delta) {
+    // Ribbon velocity proportional to volume
     mPos.z += mVel * delta;
 
 #if VR
