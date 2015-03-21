@@ -43,20 +43,20 @@ void PitchCircle::update(float delta) {
         size_t idx = mMesh.getNumVertices();
 
         mMesh.appendVertex(mCenter + ci::Vec3f(cosf(angle) * mRadius,
-                                              sinf(angle) * mRadius,
-                                              0));
+                                               sinf(angle) * mRadius,
+                                               0));
         mMesh.appendColorRgba(COLOR);
         mMesh.appendVertex(mCenter + ci::Vec3f(cosf(angle) * (mRadius + BORDER_WIDTH),
-                                              sinf(angle) * (mRadius + BORDER_WIDTH),
-                                              0));
+                                               sinf(angle) * (mRadius + BORDER_WIDTH),
+                                               0));
         mMesh.appendColorRgba(COLOR);
         mMesh.appendVertex(mCenter + ci::Vec3f(cosf(nextAngle) * (mRadius + BORDER_WIDTH),
-                                              sinf(nextAngle) * (mRadius + BORDER_WIDTH),
-                                              0));
+                                               sinf(nextAngle) * (mRadius + BORDER_WIDTH),
+                                               0));
         mMesh.appendColorRgba(COLOR);
         mMesh.appendVertex(mCenter + ci::Vec3f(cosf(nextAngle) * mRadius,
-                                              sinf(nextAngle) * mRadius,
-                                              0));
+                                               sinf(nextAngle) * mRadius,
+                                               0));
         mMesh.appendColorRgba(COLOR);
 
         mMesh.appendTriangle(idx + 0, idx + 1, idx + 2);

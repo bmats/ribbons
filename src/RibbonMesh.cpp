@@ -10,6 +10,7 @@
 
 #include "RibbonMesh.h"
 #include "RibbonsApp.h"
+#include "cinder/Rand.h"
 
 // Accuracy of ribbon, # quads / 1 unit length
 #define RIBBON_QUAD_PER_LENGTH 2
@@ -28,15 +29,15 @@ RibbonMesh::RibbonMesh()
 }
 
 void RibbonMesh::reset() {
-    mAngle = randf() * 2.0f * M_PI;
-    mDist  = 10.0f + randf() * 5.0f;
+    mAngle = ci::randFloat(2.0f * M_PI);
+    mDist  = 10.0f + ci::randFloat(5.0f);
 
     mPos.x = cosf(mAngle) * mDist;
     mPos.y = sinf(mAngle) * mDist;
 #if VR
-    mPos.z = randf() * -CAMERA_DISTANCE * 2;
+    mPos.z = ci::randFloat(-CAMERA_DISTANCE * 2);
 #else
-    mPos.z = randf() * -CAMERA_DISTANCE;
+    mPos.z = ci::randFloat(-CAMERA_DISTANCE);
 #endif
 
     mStartZ = mPos.z;

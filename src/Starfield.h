@@ -15,7 +15,12 @@
 #include "AudioProcessor.h"
 
 struct Star {
+#if VR
+    ci::Vec3f pos;
+#else
     ci::Vec2f pos;
+#endif
+
     float radius;
     size_t binId;
 };

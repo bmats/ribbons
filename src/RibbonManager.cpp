@@ -11,7 +11,6 @@
 #include "cinder/Color.h"
 #include "RibbonsApp.h"
 
-#define NUM_BIN_GROUPS 8
 #if VR
 # define RIBBONS_PER_BIN 12
 #else

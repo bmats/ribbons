@@ -343,6 +343,12 @@ void RibbonsApp::draw() {
         gl::setMatrices(mCam);
 
 #if !VR
+        // If 2D, draw the starfield behind the ribbons
+        if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
+            mStarfield.setOpacity(mNightModeOpacityAnim.value());
+            mStarfield.draw();
+        }
+
         // "Pulse" with the volume, but this wouldn't work with a HMD
         mCam.setFov(60.0f - vol * 5.0f);
         gl::setMatrices(mCam);
@@ -354,18 +360,15 @@ void RibbonsApp::draw() {
             gl::draw(circle.getMesh());
         }
 
-#if !VR
-        // Undo FOV change for background
-        mCam.setFov(60.0f);
-        gl::setMatrices(mCam);
-#endif
+//        mPitchCircle.draw();
 
+#if VR
+        // If VR, draw the starfield after the ribbons so the starfield doesn't appear over transparent ribbons
         if (mIsNightModeEnabled || !mNightModeOpacityAnim.isComplete()) {
             mStarfield.setOpacity(mNightModeOpacityAnim.value());
             mStarfield.draw();
         }
-
-//        mPitchCircle.draw();
+#endif
 
         gl::popMatrices();
 

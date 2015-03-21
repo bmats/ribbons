@@ -15,6 +15,5 @@ Turn VR support on and off by changing `VR=1` to `VR=0` or vice versa in Build S
 
 ### OVR
 
-- [ ] show stars all around
 - [ ] ovrHmd_GetFovTextureSize is too big: scale down for rendering (use display size?)
 - [ ] ovr shutdown throws exception: ovrHmd_Destroy is called between ovrHmd_BeginFrame and ovrHmd_EndFrame
